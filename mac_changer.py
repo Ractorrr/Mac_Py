@@ -1,9 +1,9 @@
 import subprocess
-
+import random
 import re
 import inquirer
 
-# ################################## Functions ##################################
+################################### Functions ##################################
 
 def command (final_interface, mac):
     subprocess.call(f"ifconfig {final_interface} down", shell=True)
@@ -24,31 +24,34 @@ def result ():
 
 def options ():
     options = [
-    inquirer.Checkbox(
-            "MAC Address options", message="Choose Any Mac Address!!", choices=["00:0a:95:9d:68:22","00:0a:95:9d:68:23","00:15:5d:29:8e:76","00:15:5d:29:8e:77","00:24:d7:7c:ef:80","00:24:d7:7c:ef:81","00:50:56:c0:00:01","00:50:56:c0:00:02","00:e0:4c:53:44:55","00:e0:4c:53:44:56","Custom!!"]
+    inquirer.List(
+            "MAC Address options", message="Choose Any Mac Address!!", choices=["Random","Custom!!"]
         )
     ]
     result = inquirer.prompt(options) 
-    final = result.get("Mac address is ", result)
-    f_result = str(final)
-    #print(type(f_result))
-    #result = ", ".join(item for item in final if isinstance(item, str))
-    #final_1 = final.decode("utf-8")
-    #final_1 = "".join(final)
-    #return f_result 
-    choosen_mac = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", f_result)
-    #return choosen_mac.group(0)
-    if choosen_mac:
-        return choosen_mac.group(0)
-    else:
-        custom = input("Enter the your custom MAC Address ==> ")
-        choosen_custom = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", custom)
-        if choosen_custom:
-            return choosen_custom.group(0)
-        else:
-            print("[+] Invaild Mac Address!!")
-            quit()
-    
+    f2r = str(result)  
+    fresult = f2r
+    reg_choice = re.search(r"Random|Custom!!", fresult)  
+    choice = reg_choice.group(0)
+    if choice == "Random":                  
+            return randmac() 
+    elif choice == "Custom!!":
+            print("Custom working perfectly!!")
+            custom = input("Enter the your custom MAC Address ==> ")
+            choosen_custom = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", custom)
+            if choosen_custom:
+                return choosen_custom.group(0)
+            else:
+                print("[+] Invaild Mac Address!!")
+                quit("Please Try Again and Enter a vaild MAC Address!!")
+
+def randmac():
+    hex_list = ['a','b','c','d','e','f',1,2,3,4,5,6,7,8,9]
+    output_list = [str(random.choice(hex_list)) + str(random.choice(hex_list)) for n in range (6)]
+    mac = (":".join(output_list))
+    return mac
+
+
 ###############################################################################
 
 new_mac = result()
@@ -70,18 +73,18 @@ if interface == "1" or interface == "wlan0":
     print("[+] You have selected wlan0!!")
     final_interface = "wlan0"
 elif interface == "2" or interface == "eth0":  
-    print()
+
     print("[+] You have selected eth0!!")
-    print()
+
     final_interface = "eth0"
 else:
-    print()
-    print("error!!")
+    
+    print("Invaild Choice!!")
+    quit("Please Try Again!!")
 
 
 
 mac = options()
-
 
 # mac = input(
 #     # "[+] Input you prefered mac address below 👇\n"
@@ -91,25 +94,27 @@ mac = options()
 # )
 
 
-print()
+
 print(f"[+] You entered {mac}")
 command(final_interface,mac)
-print()
+
 print(f"[+] Changing {final_interface} interface to {mac}.....")
 
 if new_mac == mac:
-    print()
+
     print("They are same!!")
 else:
-    print()
+
     print("[+] Mac Address has be changed!!")
 
 # print(f"[+] Succesfully Changed The Mac Address")
-print()
+
 if result:
     print(result())
 else:
     print("Can't Read Mac Address!!")
+
+
 
 
 quit("\nChalo Sahab ab me chalta hu!!")
